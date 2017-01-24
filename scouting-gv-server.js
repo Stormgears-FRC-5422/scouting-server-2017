@@ -4,6 +4,7 @@
 const Client = require("hangupsjs");
 const Schema = require("hangupsjs/lib/schema");
 const Q = require("q");
+const RandExp = require("randexp");
 require('dotenv').config();
 
 const creds = function() {
@@ -15,10 +16,9 @@ const creds = function() {
 const client = new Client();
 client.loglevel("info");
 
+const randomReplier = new RandExp(/([Tt]hank(s| you)|(([Gg]ot it|O[kK]|ok)(,? (thanks|thank you))?))(\.|!{1,3}|)/);
+
 client.on("chat_message", function(ev) {
-	if (ev.sender_id.gaia_id === "116059534239720293301") {
-		return;
-	}
 	console.log(ev);
 
 	// get the original message text
@@ -28,7 +28,7 @@ client.on("chat_message", function(ev) {
 	}
 
 	// send a message of acknowledgement
-	client.sendchatmessage(ev.conversation_id.id, [[0, 'Got it! (the time is ' + Date.now() + ")"]], null, null, null, [Schema.ClientDeliveryMediumType.GOOGLE_VOICE]); // only supports Google Voice
+	client.sendchatmessage(ev.conversation_id.id, [[0, randomReplier.gen()]], null, null, null, [Schema.ClientDeliveryMediumType.GOOGLE_VOICE]); // only supports Google Voice
 });
 
 const reconnect = function() {
