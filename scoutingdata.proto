@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option optimize_for = LITE_RUNTIME;
+
+message Event {
+    string password = 1;
+    string eventCode = 2;
+    string scoutType = 3;
+    int32 teamNumber = 4;
+    int32 m_matchNumber = 5;
+    string m_matchType = 6;
+    string m_allianceColor = 7;
+    string m_auto_gearStrategy = 8;
+    int32 m_auto_lowShots = 9;
+    int32 m_auto_highShots = 10;
+    int32 m_auto_percentShotsMissed = 11;
+    bool m_auto_crossedBaseline = 12;
+    int32 m_tele_gearsPlaced = 13;
+    int32 m_tele_lowShots = 14;
+    int32 m_tele_highShots = 15;
+    string m_tele_percentShotsMissed = 16;
+    int32 m_tele_rotorsSpinning = 17;
+    string m_tele_ballRetrievalMethod = 18;
+    string m_tele_robotClimbStatus = 19;
+    bool m_tele_airshipReadyForTakeoff = 20;
+    string m_comments = 21;
+    string m_overallStrategy = 22;
+    int32 m_redMatchPoints = 23;
+    int32 m_blueMatchPoints = 24;
+    int32 m_redRankingPoints = 25;
+    int32 m_blueRankingPoints = 26;
+    string p_teamName = 27;
+    string p_drivetraintype = 28;
+    string p_matchStrategy = 29;
+    string p_robotStrengths = 30;
+    string p_robotWeaknesses = 31;
+    string p_otherComments = 32;
+}

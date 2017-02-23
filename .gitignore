@@ -139,3 +139,6 @@ crashlytics-build.properties
 fabric.properties
 
 .env
+cookies.json
+refresh-token.txt
+serviceaccount.json
