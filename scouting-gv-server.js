@@ -9,6 +9,8 @@ const RandExp = require("randexp");
 const baseX = require("base-x");
 const google = require("googleapis");
 const googleAuth = require("google-auth-library");
+const express = require("express");
+const bodyParser = require("body-parser");
 require('dotenv').config();
 
 const creds = function() {
@@ -16,6 +18,53 @@ const creds = function() {
 		auth: () => process.env.GOOGLE_OAUTH_TOKEN // https://github.com/tdryer/hangups/issues/260#issuecomment-246578670
 	};
 };
+
+const app = express();
+app.use(bodyParser.raw({
+	inflate: true,
+	limit: '100kb',
+	type: '*/*'
+}));
+app.post("/", function(req, res) {
+	console.log("Got HTTP message");
+	const message = Event.decode(req.body).toObject();
+	console.log(message);
+
+	delete message.password;
+
+	let values = [
+		(new Date()).toISOString() // timestamp
+	];
+	eventFields.forEach(f => {
+		if (message.hasOwnProperty(f)) {
+			values.push(message[f]);
+		} else {
+			values.push("");
+		}
+	});
+	// submit to GSheets
+	sheets.spreadsheets.values.append({
+		auth: authClient,
+		range: "Data",
+		valueInputOption: "RAW",
+		resource: {
+			values: [
+				values
+			]
+		},
+		spreadsheetId: process.env.SHEET_ID
+	}, function(err, reso) {
+		if (err) {
+			console.error(err);
+			res.status(500).send("An error occurred");
+			return;
+		}
+
+		res.send("OK");
+	});
+});
+
+app.listen(5000);
 
 const client = new Client({
 	tokenPersistence: {
@@ -105,13 +154,19 @@ client.on("chat_message", function(ev) {
 		messageText += seg.text.trim();
 	});
 
+	// console.log(messageText);
+
+	messageText = messageText.replace(/\s+/g, "");
+
 	if (!messageText.match(/^STORMGEARS_SCOUT/)) {
 		return;
 	}
 	console.log(messageText);
 	messageText = messageText.substring("STORMGEARS_SCOUT".length).trim();
 
-	const message = Event.decode(base94.decode(messageText)).toObject();
+	const decoded = base94.decode(messageText);
+	console.log(decoded.toString("hex"));
+	const message = Event.decode(decoded).toObject();
 	console.log(message);
 
 	delete message.password;
