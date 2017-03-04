@@ -1,7 +1,7 @@
 {
-  "name": "scouting-gv",
+  "name": "scouting-server",
   "version": "1.0.0",
-  "main": "scouting-gv-server.js",
+  "main": "scouting-server.js",
   "dependencies": {
     "base-x": "^2.0.3",
     "body-parser": "^1.16.1",

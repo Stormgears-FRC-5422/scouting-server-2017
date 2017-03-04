@@ -1,0 +1,33 @@
+{
+	"conversation_id": {
+		"id": "Ugwwf1snuMjcNx9Ewel4AaABAQ"
+	},
+	"sender_id": {
+		"gaia_id": "103413691658339007823",
+		"chat_id": "103413691658339007823"
+	},
+	"timestamp": 1485293667573859,
+	"self_event_state": {
+		"user_id": {
+			"gaia_id": "116059534239720293301",
+			"chat_id": "116059534239720293301"
+		},
+		"client_generated_id": null,
+		"notification_level": "RING"
+	},
+	"chat_message": {
+		"annotation": null,
+		"message_content": {
+			"segment": [
+				{
+					"type": "TEXT",
+					"text": "DJehheshsvgsf",
+					"formatting": null,
+					"link_data": null
+				}
+			]
+		}
+	},
+	"event_id": "842NmAIIS-L8O7txOut3tM",
+	"event_otr": "ON_THE_RECORD"
+}

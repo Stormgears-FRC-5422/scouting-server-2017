@@ -25,46 +25,6 @@ app.use(bodyParser.raw({
 	limit: '100kb',
 	type: '*/*'
 }));
-app.post("/", function(req, res) {
-	console.log("Got HTTP message");
-	const message = Event.decode(req.body).toObject();
-	console.log(message);
-
-	delete message.password;
-
-	let values = [
-		(new Date()).toISOString() // timestamp
-	];
-	eventFields.forEach(f => {
-		if (message.hasOwnProperty(f)) {
-			values.push(message[f]);
-		} else {
-			values.push("");
-		}
-	});
-	// submit to GSheets
-	sheets.spreadsheets.values.append({
-		auth: authClient,
-		range: "Data",
-		valueInputOption: "RAW",
-		resource: {
-			values: [
-				values
-			]
-		},
-		spreadsheetId: process.env.SHEET_ID
-	}, function(err, reso) {
-		if (err) {
-			console.error(err);
-			res.status(500).send("An error occurred");
-			return;
-		}
-
-		res.send("OK");
-	});
-});
-
-app.listen(5000);
 
 const client = new Client({
 	tokenPersistence: {
@@ -112,6 +72,61 @@ auth.getApplicationDefault(function(err, auth) {
 
 const sheets = google.sheets("v4");
 
+client.on("chat_message", function(ev) {
+	// get the original message text
+	let messageText = "";
+	// let messageText = ev.chat_message.message_content.segment[0].text;
+	ev.chat_message.message_content.segment.forEach(function(seg) {
+		messageText += seg.text.trim();
+	});
+
+	// console.log(messageText);
+
+	messageText = messageText.replace(/\s+/g, "");
+
+	if (!messageText.match(/^STORMGEARS_SCOUT/)) {
+		return;
+	}
+	console.log(messageText);
+	messageText = messageText.substring("STORMGEARS_SCOUT".length).trim();
+
+	const decoded = base94.decode(messageText);
+	const message = Event.decode(decoded).toObject();
+	console.log(message);
+
+	delete message.password;
+
+	sendToSheet(message, function(err, res) {
+		if (err) {
+			console.error(err);
+			client.sendchatmessage(ev.conversation_id.id, [[0, "Oh no! Something went wrong!"]], null, null, null, [Schema.ClientDeliveryMediumType.GOOGLE_VOICE]);
+			return;
+		}
+
+		client.sendchatmessage(ev.conversation_id.id, [[0, randomReplier.gen()]], null, null, null, [Schema.ClientDeliveryMediumType.GOOGLE_VOICE]); // only supports Google Voice
+	})
+});
+
+app.post("/", function(req, res) {
+	console.log("Got HTTP message");
+	const message = Event.decode(req.body).toObject();
+	delete message.password;
+
+	console.log(message);
+
+	sendToSheet(message, function(err, reso) {
+		if (err) {
+			console.error(err);
+			res.status(500).send("An error occurred");
+			return;
+		}
+
+		res.send("OK");
+	});
+});
+
+app.listen(5000);
+
 const eventFields = [
 	"eventCode",
 	"scoutType",
@@ -145,38 +160,13 @@ const eventFields = [
 	"pRobotWeaknesses",
 	"pOtherComments"
 ];
-
-client.on("chat_message", function(ev) {
-	// get the original message text
-	let messageText = "";
-	// let messageText = ev.chat_message.message_content.segment[0].text;
-	ev.chat_message.message_content.segment.forEach(function(seg) {
-		messageText += seg.text.trim();
-	});
-
-	// console.log(messageText);
-
-	messageText = messageText.replace(/\s+/g, "");
-
-	if (!messageText.match(/^STORMGEARS_SCOUT/)) {
-		return;
-	}
-	console.log(messageText);
-	messageText = messageText.substring("STORMGEARS_SCOUT".length).trim();
-
-	const decoded = base94.decode(messageText);
-	console.log(decoded.toString("hex"));
-	const message = Event.decode(decoded).toObject();
-	console.log(message);
-
-	delete message.password;
-
+function sendToSheet(event, callback) {
 	let values = [
 		(new Date()).toISOString() // timestamp
 	];
 	eventFields.forEach(f => {
-		if (message.hasOwnProperty(f)) {
-			values.push(message[f]);
+		if (event.hasOwnProperty(f)) {
+			values.push(event[f]);
 		} else {
 			values.push("");
 		}
@@ -192,19 +182,8 @@ client.on("chat_message", function(ev) {
 			]
 		},
 		spreadsheetId: process.env.SHEET_ID
-	}, function(err, res) {
-		if (err) {
-			console.error(err);
-			client.sendchatmessage(ev.conversation_id.id, [[0, "Oh no! Something went wrong!"]], null, null, null, [Schema.ClientDeliveryMediumType.GOOGLE_VOICE]);
-			return;
-		}
-
-		client.sendchatmessage(ev.conversation_id.id, [[0, randomReplier.gen()]], null, null, null, [Schema.ClientDeliveryMediumType.GOOGLE_VOICE]); // only supports Google Voice
-	});
-
-	// send a message of acknowledgement
-
-});
+	}, );
+}
 
 const reconnect = function() {
 	console.log("Connecting...");
