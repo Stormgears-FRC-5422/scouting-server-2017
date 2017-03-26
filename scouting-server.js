@@ -182,7 +182,7 @@ function sendToSheet(event, callback) {
 			]
 		},
 		spreadsheetId: process.env.SHEET_ID
-	}, );
+	}, callback);
 }
 
 const reconnect = function() {
