@@ -123,7 +123,8 @@ app.post("/", function (req, res) {
 
 		// FIXME: This is insecure!
 		if (message.password !== process.env.SUBMISSION_PASSWORD) {
-			return res.status(403).send("Invalid password.");
+			return res.redirect("/#invalid_password_status");
+			// return res.status(403).send("Invalid password.");
 		}
 
 		message.mAutoPercentShotsMissed = Math.round((message.mAutoLowShots + message.mAutoHighShots) / 20 * 100);
@@ -138,11 +139,18 @@ app.post("/", function (req, res) {
 	sendToSheet(message, function (err, reso) {
 		if (err) {
 			console.error(err);
-			res.status(500).send("An error occurred");
-			return;
+			if (isWebInterface) {
+				return res.redirect("/#error_status");
+			} else {
+				return res.status(500).send("An error occurred");
+			}
 		}
 
-		res.send("OK");
+		if (isWebInterface) {
+			res.redirect("/#ok_status");
+		} else {
+			res.send("OK");
+		}
 	});
 });
 

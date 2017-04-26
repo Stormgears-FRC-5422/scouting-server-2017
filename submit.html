@@ -43,11 +43,48 @@
 		input.submit {
 			margin-top: 1em;
 		}
+
+		.message {
+			padding: 0.7em;
+			border: 1px solid;
+			margin-bottom: 1em;
+
+			display: none;
+		}
+		.message.error {
+			border-color: #FF4136;
+			background-color: #ffc1bf;
+			color: #4f110f;
+		}
+		.message.success {
+			border-color: #01FF70;
+			background-color: #bfffdb;
+			color: #014b22;
+		}
+
+		.message-close {
+			color: inherit;
+			float: right;
+		}
+
+		#invalid_password_status:target ~ #invalid-pass-alert,
+		#ok_status:target ~ #success-alert,
+		#error_status:target ~ #error-alert {
+			display: block;
+		}
 	</style>
 </head>
 <body>
 	<div class="container">
-		<h1>Stormgears Scouting Web Submission</h1>
+		<div id="invalid_password_status"></div>
+		<div id="error_status"></div>
+		<div id="ok_status"></div>
+
+		<h1>Stormgears Scouting</h1>
+
+		<div class="message error" id="invalid-pass-alert">Invalid password. <a href="#" class="message-close">Close</a></div>
+		<div class="message error" id="error-alert">An error occurred. <a href="#" class="message-close">Close</a></div>
+		<div class="message success" id="success-alert">OK. <a href="#" class="message-close">Close</a></div>
 
 		<input type="radio" name="type-selection" id="match-scouting-radio" /> <label for="match-scouting-radio">Match Scouting</label>
 		<input type="radio" name="type-selection" id="pit-scouting-radio" /> <label for="pit-scouting-radio">Pit Scouting</label>
@@ -64,7 +101,6 @@
 				<p>
 					<label for="password">Password</label>
 					<input type="password" name="password" id="password" required>
-					To prevent spam, please enter the provided password for this form.
 				</p>
 			</fieldset>
 
@@ -219,7 +255,6 @@
 				<p>
 					<label for="password2">Password</label>
 					<input type="password" name="password" id="password2" required>
-					To prevent spam, please enter the provided password for this form.
 				</p>
 			</fieldset>
 
@@ -293,6 +328,35 @@
 				}, false);
 			}
 		}
+
+		var id = document.getElementById.bind(document);
+
+		var eC = id("eventCode");
+		var eC2 = id("eventCode2");
+		var pass = id("password");
+		var pass2 = id("password2");
+
+		// cache event code and password
+		var lsEventCode = localStorage.getItem("eventCode");
+		if (lsEventCode) {
+			eC.value = lsEventCode;
+			eC2.value = lsEventCode;
+		}
+
+		var lsPass = localStorage.getItem("password");
+		if (lsPass) {
+			pass.value = lsPass;
+			pass2.value = lsPass;
+		}
+
+		id("match-scouting-form").addEventListener("submit", function() {
+			localStorage.setItem("eventCode", eC.value);
+			localStorage.setItem("password", pass.value);
+		});
+		id("pit-scouting-form").addEventListener("submit", function() {
+			localStorage.setItem("eventCode", eC2.value);
+			localStorage.setItem("password", pass2.value);
+		});
 	</script>
 </body>
 </html>
