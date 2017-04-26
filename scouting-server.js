@@ -11,7 +11,7 @@ const google = require("googleapis");
 const googleAuth = require("google-auth-library");
 const express = require("express");
 const bodyParser = require("body-parser");
-const compression = require("compression");
+// const compression = require("compression");
 require('dotenv').config();
 
 const creds = function () {
@@ -21,7 +21,7 @@ const creds = function () {
 };
 
 const app = express();
-app.use(compression());
+// app.use(compression());
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.raw({
 	inflate: true,

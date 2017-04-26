@@ -5,7 +5,6 @@
   "dependencies": {
     "base-x": "^2.0.3",
     "body-parser": "^1.16.1",
-    "compression": "^1.6.2",
     "dotenv": "^4.0.0",
     "express": "^4.14.1",
     "google-auth-library": "^0.10.0",
