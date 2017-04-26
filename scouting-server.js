@@ -11,30 +11,33 @@ const google = require("googleapis");
 const googleAuth = require("google-auth-library");
 const express = require("express");
 const bodyParser = require("body-parser");
+const compression = require("compression");
 require('dotenv').config();
 
-const creds = function() {
+const creds = function () {
 	return {
 		auth: () => process.env.GOOGLE_OAUTH_TOKEN // https://github.com/tdryer/hangups/issues/260#issuecomment-246578670
 	};
 };
 
 const app = express();
+app.use(compression());
+app.use(bodyParser.urlencoded());
 app.use(bodyParser.raw({
 	inflate: true,
 	limit: '100kb',
-	type: '*/*'
+	type: 'application/x-protobuf'
 }));
 
 const client = new Client({
 	tokenPersistence: {
-		save: function(token) {
+		save: function (token) {
 			return new Promise((resolve, reject) => {
 				// TODO
 				console.log("TODO: Save refresh token: " + token);
 			});
 		},
-		load: function() {
+		load: function () {
 			return new Promise((resolve, reject) => {
 				console.log("loading refresh token");
 				resolve(process.env.GOOGLE_REFRESH_TOKEN);
@@ -54,7 +57,7 @@ const Event = protobuf.loadSync("scoutingdata.proto").lookup("Event");
 // authorize Google Sheets
 const auth = new googleAuth();
 let authClient;
-auth.getApplicationDefault(function(err, auth) {
+auth.getApplicationDefault(function (err, auth) {
 	if (err) {
 		console.log('Authentication failed because of ', err);
 		process.exit(1);
@@ -72,11 +75,11 @@ auth.getApplicationDefault(function(err, auth) {
 
 const sheets = google.sheets("v4");
 
-client.on("chat_message", function(ev) {
+client.on("chat_message", function (ev) {
 	// get the original message text
 	let messageText = "";
 	// let messageText = ev.chat_message.message_content.segment[0].text;
-	ev.chat_message.message_content.segment.forEach(function(seg) {
+	ev.chat_message.message_content.segment.forEach(function (seg) {
 		messageText += seg.text.trim();
 	});
 
@@ -96,7 +99,7 @@ client.on("chat_message", function(ev) {
 
 	delete message.password;
 
-	sendToSheet(message, function(err, res) {
+	sendToSheet(message, function (err, res) {
 		if (err) {
 			console.error(err);
 			client.sendchatmessage(ev.conversation_id.id, [[0, "Oh no! Something went wrong!"]], null, null, null, [Schema.ClientDeliveryMediumType.GOOGLE_VOICE]);
@@ -107,14 +110,32 @@ client.on("chat_message", function(ev) {
 	})
 });
 
-app.post("/", function(req, res) {
+app.post("/", function (req, res) {
 	console.log("Got HTTP message");
-	const message = Event.decode(req.body).toObject();
+
+	let message;
+	let isWebInterface = false;
+	if (req.header("Content-Type") === "application/x-protobuf") {
+		message = Event.decode(req.body).toObject();
+	} else {
+		message = req.body;
+		isWebInterface = true;
+
+		// FIXME: This is insecure!
+		if (message.password !== process.env.SUBMISSION_PASSWORD) {
+			return res.status(403).send("Invalid password.");
+		}
+
+		message.mAutoPercentShotsMissed = Math.round((message.mAutoLowShots + message.mAutoHighShots) / 20 * 100);
+		message.mAutoCrossedBaseline = message.mAutoCrossedBaseline === "on";
+		message.mTeleAirshipReadyForTakeoff = message.mTeleAirshipReadyForTakeoff === "on";
+	}
+
 	delete message.password;
 
 	console.log(message);
 
-	sendToSheet(message, function(err, reso) {
+	sendToSheet(message, function (err, reso) {
 		if (err) {
 			console.error(err);
 			res.status(500).send("An error occurred");
@@ -123,6 +144,10 @@ app.post("/", function(req, res) {
 
 		res.send("OK");
 	});
+});
+
+app.get("/", function (req, res) {
+	res.sendFile("submit.html", { root: __dirname });
 });
 
 app.listen(5000);
@@ -185,16 +210,16 @@ function sendToSheet(event, callback) {
 	}, callback);
 }
 
-const reconnect = function() {
+const reconnect = function () {
 	console.log("Connecting...");
-	client.connect(creds).then(function() {
+	client.connect(creds).then(function () {
 		console.log("Connected to Hangouts");
 	});
 };
 
-client.on('connect_failed', function() {
+client.on('connect_failed', function () {
 	console.log("Oh noes, lost connection!");
-	Q.Promise(function(rs) {
+	Q.Promise(function (rs) {
 		setTimeout(rs, 3000);
 	}).then(reconnect);
 });

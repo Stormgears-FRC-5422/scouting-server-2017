@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"
+	      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Stormgears Scouting Server</title>
+
+	<style>
+		body {
+			font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+		}
+		.container {
+			max-width: 960px;
+			margin-left: auto;
+			margin-right: auto;
+		}
+		#match-scouting-form {
+			display: none;
+		}
+		body #match-scouting-radio:checked ~ #match-scouting-form {
+			display: block;
+		}
+		#pit-scouting-form {
+			display: none;
+		}
+		body #pit-scouting-radio:checked ~ #pit-scouting-form {
+			display: block;
+		}
+		textarea {
+			width: 100%;
+			max-width: 40em;
+		}
+		form {
+			margin-top: 1em;
+		}
+
+		fieldset {
+			margin-top: 0.4em;
+		}
+
+		input.submit {
+			margin-top: 1em;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>Stormgears Scouting Web Submission</h1>
+
+		<input type="radio" name="type-selection" id="match-scouting-radio" /> <label for="match-scouting-radio">Match Scouting</label>
+		<input type="radio" name="type-selection" id="pit-scouting-radio" /> <label for="pit-scouting-radio">Pit Scouting</label>
+
+		<form action="/" method="post" id="match-scouting-form">
+			<input type="hidden" name="scoutType" value="match">
+
+			<fieldset>
+				<legend>Metadata</legend>
+				<p>
+					<label for="eventCode">Event Code</label>
+					<input type="text" name="eventCode" id="eventCode" required>
+				</p>
+				<p>
+					<label for="password">Password</label>
+					<input type="password" name="password" id="password" required>
+					To prevent spam, please enter the provided password for this form.
+				</p>
+			</fieldset>
+
+			<fieldset>
+				<legend>General Information</legend>
+				<p>
+					<label for="teamNumber">Team Number</label>
+					<input type="number" id="teamNumber" name="teamNumber" required placeholder="#">
+				</p>
+				<p>
+					<label for="mMatchNumber">Match Number</label>
+					<input type="number" id="mMatchNumber" name="mMatchNumber" required placeholder="#">
+				</p>
+				<p>
+					<label for="mMatchType">Match Type</label>
+					<select name="mMatchType" id="mMatchType">
+						<option value="Qualification">Qualification</option>
+						<option value="Playoff">Playoff</option>
+					</select>
+				</p>
+				<p>
+					<label>Alliance</label>
+					<input type="radio" name="mAlliance" id="mAlliance-red" value="Red" required> <label for="mAlliance-red">Red</label>
+					<input type="radio" name="mAlliance" id="mAlliance-blue" value="Blue" required> <label for="mAlliance-blue">Blue</label>
+				</p>
+			</fieldset>
+
+			<fieldset>
+				<legend>Autonomous Period</legend>
+				<p>
+					<label for="mAutoGearStrategy">Autonomous Gear Placement</label>
+					<select name="mAutoGearStrategy" id="mAutoGearStrategy">
+						<option value="Attempted to Place Gear">Attempted to Place Gear</option>
+						<option value="Placed Gear">Placed Gear</option>
+						<option value="Did not Attempt to Place Gear">Did not Attempt to Place Gear</option>
+					</select>
+				</p>
+				<p>
+					<label for="mAutoLowShots">Low Boiler: Shots Made</label>
+					<input type="number" min="0" max="500" id="mAutoLowShots" name="mAutoLowShots">
+				</p>
+				<p>
+					<label for="mAutoHighShots">High Boiler: Shots Made</label>
+					<input type="number" min="0" max="500" id="mAutoHighShots" name="mAutoHighShots">
+				</p>
+
+				<p>
+					<input type="checkbox" id="mAutoCrossedBaseline" name="mAutoCrossedBaseline">
+					<label for="mAutoCrossedBaseline">Robot Crossed Base Line</label>
+				</p>
+			</fieldset>
+
+			<fieldset>
+				<legend>Teleoperated Period</legend>
+				<p>
+					<label for="mTeleGearsPlaced">Gears Placed</label>
+					<input type="number" min="0" max="500" name="mTeleGearsPlaced" id="mTeleGearsPlaced">
+				</p>
+				<p>
+					<label for="mTeleLowShots">Low Boiler: Shots Made</label>
+					<input type="number" min="0" max="500" name="mTeleLowShots" id="mTeleLowShots">
+				</p>
+				<p>
+					<label for="mTeleHighShots">High Boiler: Shots Made</label>
+					<input type="number" min="0" max="500" name="mTeleHighShots" id="mTeleHighShots">
+				</p>
+				<p>
+					<label for="mTelePercentShotsMissed">Amount of Shots Missed</label>
+					<select name="mTelePercentShotsMissed" id="mTelePercentShotsMissed">
+						<option value="None">None</option>
+						<option value="Some">Some</option>
+						<option value="Most">Most</option>
+						<option value="All">All</option>
+					</select>
+				</p>
+				<p>
+					<label for="mTeleRotorsSpinning">Number of Rotors Spinning</label>
+					<input type="number" placeholder="#" id="mTeleRotorsSpinning" name="mTeleRotorsSpinning">
+				</p>
+
+				<p>
+					<label for="mTeleBallRetrievalMethod">Ball Retrieval Method</label>
+					<select name="mTeleBallRetrievalMethod" id="mTeleBallRetrievalMethod">
+						<option value="Does Not Shoot Balls">Does Not Shoot Balls</option>
+						<option value="Balls Fall into Robot from Hopper">Balls Fall into Robot from Hopper</option>
+						<option value="Robot Picks up Balls from Field Floor">Picks up Balls from Field Floor</option>
+						<option value="Robot Does not Retrieve Additional Balls During Match">Does not Retrieve Additional Balls During Match</option>
+					</select>
+				</p>
+				<p>
+					<label for="mTeleRobotClimbStatus">Robot Climb Status</label>
+					<select name="mTeleRobotClimbStatus" id="mTeleRobotClimbStatus">
+						<option value="Did not attempt to climb">Did not attempt to climb</option>
+						<option value="Attempted to Climb; Did not Reach Rope">Attempted to Climb; Did not Reach Rope</option>
+						<option value="Grappled onto Rope">Grappled onto Rope</option>
+						<option value="Climbed Rope Half Way">Climbed Rope Half Way</option>
+						<option value="Climbed Rope and Activated Touchpad">Climbed Rope and Activated Touchpad</option>
+					</select>
+				</p>
+				<p>
+					<input type="checkbox" id="mTeleAirshipReadyForTakeoff" name="mTeleAirshipReadyForTakeoff">
+					<label for="mTeleAirshipReadyForTakeoff">Airship Ready for Takeoff</label>
+				</p>
+			</fieldset>
+
+			<fieldset>
+				<legend><label for="mComments">Additional Comments</label></legend>
+				<textarea name="mComments" rows="6" id="mComments"></textarea>
+			</fieldset>
+
+			<fieldset>
+				<p>
+					<label for="mOverallStrategy">Robot's Strategy</label>
+					<select name="mOverallStrategy" id="mOverallStrategy">
+						<option value="Gears Only">Gears Only</option>
+						<option value="Fuel Only">Fuel Only</option>
+						<option value="Both Gears and Fuel">Both Gears and Fuel</option>
+						<option value="Defense">Defense</option>
+						<option value="Sits Still for the Match">Sits Still for the Match</option>
+					</select>
+				</p>
+				<p>
+					<label for="mRedMatchPoints">Red Match Pts</label>
+					<input type="number" id="mRedMatchPoints" name="mRedMatchPoints" placeholder="#">
+				</p>
+				<p>
+					<label for="mBlueMatchPoints">Blue Match Pts</label>
+					<input type="number" id="mBlueMatchPoints" name="mBlueMatchPoints" placeholder="#">
+				</p>
+				<p>
+					<label for="mRedRankingPoints">Red Ranking Pts</label>
+					<input type="number" id="mRedRankingPoints" name="mRedRankingPoints" placeholder="#">
+				</p>
+				<p>
+					<label for="mBlueRankingPoints">Blue Ranking Pts</label>
+					<input type="number" id="mBlueRankingPoints" name="mBlueRankingPoints" placeholder="#">
+				</p>
+			</fieldset>
+
+			<input type="submit" class="submit" value="Send Form">
+		</form>
+
+		<form action="/" method="post" id="pit-scouting-form">
+			<input type="hidden" name="scoutType" value="pit">
+
+			<fieldset>
+				<legend>Metadata</legend>
+				<p>
+					<label for="eventCode2">Event Code</label>
+					<input type="text" name="eventCode" id="eventCode2" required>
+				</p>
+				<p>
+					<label for="password2">Password</label>
+					<input type="password" name="password" id="password2" required>
+					To prevent spam, please enter the provided password for this form.
+				</p>
+			</fieldset>
+
+			<fieldset>
+				<legend>General Information</legend>
+
+				<p>
+					<label for="teamNumberPit">Team Number</label>
+					<input type="number" id="teamNumberPit" name="teamNumber" required placeholder="#">
+				</p>
+				<p>
+					<label for="pTeamName">Team Name</label>
+					<input type="text" id="pTeamName" name="pTeamName" >
+				</p>
+			</fieldset>
+			<fieldset>
+				<legend>Pit Scouting Details</legend>
+
+				<p>
+					<label for="pDrivetraintype">Robot's Drive Train Type</label>
+					<select name="pDrivetraintype" id="pDrivetraintype">
+						<option value="Tank">Tank</option>
+						<option value="Swerve">Swerve</option>
+						<option value="Slide">Slide</option>
+						<option value="Mecanum">Mecanum</option>
+						<option value="Holonomic">Holonomic</option>
+						<option value="West Coast">West Coast</option>
+					</select>
+				</p>
+				<p>
+					<label for="pMatchStrategy">Match Strategy (Auto and Teleop)</label><br>
+					<textarea name="pMatchStrategy" id="pMatchStrategy" rows="10"></textarea>
+				</p>
+				<p>
+					<label for="pRobotStrengths">Robot Strengths</label><br>
+					<textarea name="pRobotStrengths" id="pRobotStrengths" rows="10"></textarea>
+				</p>
+				<p>
+					<label for="pRobotWeaknesses">Robot Weaknesses</label><br>
+					<textarea name="pRobotWeaknesses" id="pRobotWeaknesses" rows="10"></textarea>
+				</p>
+				<p>
+					<label for="pOtherComments">Other Comments</label><br>
+					<textarea name="pOtherComments" id="pOtherComments" rows="10"></textarea>
+				</p>
+			</fieldset>
+
+			<input type="Submit" class="submit" value="Send Form">
+		</form>
+	</div>
+
+	<br><br><br>
+
+	<script>
+		/*! modernizr 3.5.0 (Custom Build) | MIT *
+		 * https://modernizr.com/download/?-formvalidation !*/
+		!function(e,n,t){function o(e,n){return typeof e===n}function i(){var e,n,t,i,a,r,s;for(var l in d)if(d.hasOwnProperty(l)){if(e=[],n=d[l],n.name&&(e.push(n.name.toLowerCase()),n.options&&n.options.aliases&&n.options.aliases.length))for(t=0;t<n.options.aliases.length;t++)e.push(n.options.aliases[t].toLowerCase());for(i=o(n.fn,"function")?n.fn():n.fn,a=0;a<e.length;a++)r=e[a],s=r.split("."),1===s.length?Modernizr[s[0]]=i:(!Modernizr[s[0]]||Modernizr[s[0]]instanceof Boolean||(Modernizr[s[0]]=new Boolean(Modernizr[s[0]])),Modernizr[s[0]][s[1]]=i),f.push((i?"":"no-")+s.join("-"))}}function a(){return"function"!=typeof n.createElement?n.createElement(arguments[0]):u?n.createElementNS.call(n,"http://www.w3.org/2000/svg",arguments[0]):n.createElement.apply(n,arguments)}function r(){var e=n.body;return e||(e=a(u?"svg":"body"),e.fake=!0),e}function s(e,t,o,i){var s,d,l,f,u="modernizr",c=a("div"),m=r();if(parseInt(o,10))for(;o--;)l=a("div"),l.id=i?i[o]:u+(o+1),c.appendChild(l);return s=a("style"),s.type="text/css",s.id="s"+u,(m.fake?m:c).appendChild(s),m.appendChild(c),s.styleSheet?s.styleSheet.cssText=e:s.appendChild(n.createTextNode(e)),c.id=u,m.fake&&(m.style.background="",m.style.overflow="hidden",f=p.style.overflow,p.style.overflow="hidden",p.appendChild(m)),d=t(c,e),m.fake?(m.parentNode.removeChild(m),p.style.overflow=f,p.offsetHeight):c.parentNode.removeChild(c),!!d}var d=[],l={_version:"3.5.0",_config:{classPrefix:"",enableClasses:!0,enableJSClass:!0,usePrefixes:!0},_q:[],on:function(e,n){var t=this;setTimeout(function(){n(t[e])},0)},addTest:function(e,n,t){d.push({name:e,fn:n,options:t})},addAsyncTest:function(e){d.push({name:null,fn:e})}},Modernizr=function(){};Modernizr.prototype=l,Modernizr=new Modernizr;var f=[],p=n.documentElement,u="svg"===p.nodeName.toLowerCase(),c=l.testStyles=s;Modernizr.addTest("formvalidation",function(){var n=a("form");if(!("checkValidity"in n&&"addEventListener"in n))return!1;if("reportValidity"in n)return!0;var t,o=!1;return Modernizr.formvalidationapi=!0,n.addEventListener("submit",function(n){(!e.opera||e.operamini)&&n.preventDefault(),n.stopPropagation()},!1),n.innerHTML='<input name="modTest" required="required" /><button></button>',c("#modernizr form{position:absolute;top:-99999em}",function(e){e.appendChild(n),t=n.getElementsByTagName("input")[0],t.addEventListener("invalid",function(e){o=!0,e.preventDefault(),e.stopPropagation()},!1),Modernizr.formvalidationmessage=!!t.validationMessage,n.getElementsByTagName("button")[0].click()}),o}),i(),delete l.addTest,delete l.addAsyncTest;for(var m=0;m<Modernizr._q.length;m++)Modernizr._q[m]();e.Modernizr=Modernizr}(window,document);
+
+		if (!Modernizr.formvalidation) {
+			// for iOS <= 10.2
+			console.log("Polyfilling form validation");
+			var forms = document.getElementsByTagName('form');
+			for (var i = 0; i < forms.length; i++) {
+				forms[i].noValidate = true;
+
+				forms[i].addEventListener('submit', function(event) {
+					if (!event.target.checkValidity()) {
+						event.preventDefault();
+						alert("There are empty required fields.")
+					}
+				}, false);
+			}
+		}
+	</script>
+</body>
+</html>
